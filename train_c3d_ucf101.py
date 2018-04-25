@@ -25,15 +25,17 @@ import c3d_model
 import math
 import numpy as np
 
+overallApplicationStartTime = time.time()
+
 # Basic model parameters as external flags.
 flags = tf.app.flags
-gpu_num = 2
+gpu_num = 1
 #flags.DEFINE_float('learning_rate', 0.0, 'Initial learning rate.')
 flags.DEFINE_integer('max_steps', 5000, 'Number of steps to run trainer.')
-flags.DEFINE_integer('batch_size', 10, 'Batch size.')
+flags.DEFINE_integer('batch_size', 16, 'Batch size.')
 FLAGS = flags.FLAGS
 MOVING_AVERAGE_DECAY = 0.9999
-model_save_dir = './models'
+model_save_dir = './models/kth-fsaf/'
 
 def placeholder_inputs(batch_size):
   """Generate placeholder variables to represent the input tensors.
@@ -115,7 +117,9 @@ def run_training():
       os.makedirs(model_save_dir)
   use_pretrained_model = True 
   model_filename = "./sports1m_finetuning_ucf101.model"
-
+  # model_filename = "c3d_ucf101_finetune_whole_iter_20000_TF.model"
+  # model_filename = "./conv3d_deepnetA_sport1m_iter_1900000_TF.model"
+  
   with tf.Graph().as_default():
     global_step = tf.get_variable(
                     'global_step',
@@ -162,7 +166,7 @@ def run_training():
       with tf.device('/gpu:%d' % gpu_index):
         
         varlist2 = [ weights['out'],biases['out'] ]
-        varlist1 = list( set(weights.values() + biases.values()) - set(varlist2) )
+        varlist1 = list( set(list(weights.values()) + list(biases.values())) - set(varlist2) )
         logit = c3d_model.inference_c3d(
                         images_placeholder[gpu_index * FLAGS.batch_size:(gpu_index + 1) * FLAGS.batch_size,:,:,:,:],
                         0.5,
@@ -194,7 +198,7 @@ def run_training():
     null_op = tf.no_op()
 
     # Create a saver for writing training checkpoints.
-    saver = tf.train.Saver(weights.values() + biases.values())
+    saver = tf.train.Saver(list(weights.values()) + list(biases.values()))
     init = tf.global_variables_initializer()
 
     # Create a session for running Ops on the Graph.
@@ -212,12 +216,13 @@ def run_training():
     for step in xrange(FLAGS.max_steps):
       start_time = time.time()
       train_images, train_labels, _, _, _ = input_data.read_clip_and_label(
-                      filename='list/train.list',
+                      filename='./KTH-trainSAF.list',
                       batch_size=FLAGS.batch_size * gpu_num,
                       num_frames_per_clip=c3d_model.NUM_FRAMES_PER_CLIP,
                       crop_size=c3d_model.CROP_SIZE,
                       shuffle=True
                       )
+      
       sess.run(train_op, feed_dict={
                       images_placeholder: train_images,
                       labels_placeholder: train_labels
@@ -238,7 +243,7 @@ def run_training():
         train_writer.add_summary(summary, step)
         print('Validation Data Eval:')
         val_images, val_labels, _, _, _ = input_data.read_clip_and_label(
-                        filename='list/test.list',
+                        filename='./KTH-testFSAF.list',
                         batch_size=FLAGS.batch_size * gpu_num,
                         num_frames_per_clip=c3d_model.NUM_FRAMES_PER_CLIP,
                         crop_size=c3d_model.CROP_SIZE,
@@ -256,6 +261,7 @@ def run_training():
 
 def main(_):
   run_training()
+  print("Total Execision time in seconds: ",time.time() - overallApplicationStartTime)
 
 if __name__ == '__main__':
   tf.app.run()
