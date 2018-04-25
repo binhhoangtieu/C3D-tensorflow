@@ -57,12 +57,12 @@ def read_clip_and_label(filename, batch_size, start_pos=-1, num_frames_per_clip=
   if start_pos < 0:
     shuffle = True
   if shuffle:
-    video_indices = range(len(lines))
+    video_indices = list(range(len(lines)))
     random.seed(time.time())
     random.shuffle(video_indices)
   else:
     # Process videos sequentially
-    video_indices = range(start_pos, len(lines))
+    video_indices = list(range(start_pos, len(lines)))
   for index in video_indices:
     if(batch_index>=batch_size):
       next_batch_start = index
@@ -96,7 +96,7 @@ def read_clip_and_label(filename, batch_size, start_pos=-1, num_frames_per_clip=
   valid_len = len(data)
   pad_len = batch_size - valid_len
   if pad_len:
-    for i in range(pad_len):
+    for i in list(range(pad_len)):
       data.append(img_datas)
       label.append(int(tmp_label))
 

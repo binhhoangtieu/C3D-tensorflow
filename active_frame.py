@@ -9,7 +9,7 @@ import scipy.stats as stats
 
 def main():
 	video_dir = './KTH' #./testdata
-	result_dir = './KTH-SAF' #test-image
+	result_dir = './KTH-FSAF' #test-image
 	loaddata(video_dir = video_dir, depth = 24, dest_forder=result_dir)
 
 def save_image_to_file(frame_array, folder):
@@ -29,7 +29,9 @@ def loaddata(video_dir, depth, dest_forder):
 			print('Extracting file:',filename)
 
 			# frame_array = video3d_overlap(filename, depth)
-			frame_array = video3d_selected_active_frame(filename, depth)
+			# frame_array = video3d_selected_active_frame(filename, depth)
+			frame_array = full_selected_active_frame(filename, depth)
+			
 			newdir = dir + "/" + os.path.splitext(os.path.basename(filename))[0]
 			directory = os.path.join(dest_forder,newdir)
 			if not os.path.exists(directory):
@@ -45,9 +47,7 @@ def active_frames(frame_array):
 	#Sort d[i] accending under first column of di
 
 	d.sort(key=itemgetter(0)) #get the order of active frame
-	
 	d = normal_distribution(d) #assign each d one value based on normal distribution
-
 	d.sort(key=itemgetter(1)) #re_order
 	
 	frames.append(frame_array[0])
@@ -69,6 +69,23 @@ def selected_active_frame(frame_array):
 			temp_frame = frame_array[i+1]
 
 	return np.array(temp_frame)
+#this function get the most active frame
+
+def full_selected_active_frame(filename, depth):
+	cap_images = read_video_from_file(filename)
+	framearray = []
+	distance = []
+	
+	for i in range(np.size(cap_images,axis=0)-1):
+		distance.append((np.linalg.norm(cap_images[i+1]-cap_images[i]),i+1))
+	frames = [item[1] for item in sorted(distance,key = itemgetter(0))[-depth:]]
+	frames.sort()
+	
+	for i in range(np.size(frames,axis=0)):
+		framearray.append(cap_images[frames[i]])
+		
+
+	return framearray
 
 def video3d_selected_active_frame(filename, depth):
 	cap_images = read_video_from_file(filename)
