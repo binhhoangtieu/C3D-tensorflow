@@ -14,10 +14,10 @@ Then you can use ensemble.py for fusion these network. The result of my trial is
 
 | KTH      |   RGB+SAF+OF   |93.8%|
 
-| First Header  | Second Header |
-| ------------- | ------------- |
-| Content Cell  | Content Cell  |
-| Content Cell  | Content Cell  |
+| First Header  | Second Header | Thirsd Header |
+| ------------- | ------------- |------------- |
+| Content Cell  | Content Cell  |Content Cell  |
+| Content Cell  | Content Cell  |Content Cell  |
 
 ## Requirements:
 
