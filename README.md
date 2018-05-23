@@ -2,6 +2,14 @@
 
 This is a repository trying to implement [C3D-caffe][5] on tensorflow,useing models directly converted from original C3D-caffe.    
 Be aware that there are about 5% video-level accuracy margin on UCF101 split1  between our implement in tensorflow and  the original C3D-caffe.  
+## Updated:
+I add ensemble.py for ensemble multi-stream network including (optical flow, rgb, selected active frame (my own method). You can use activeframe.py for extracting active frames before feeding into C3D networks.
+
+Then you can use ensemble.py for fusion these network. The result of my trial is shown in the table bellow:
+
+| HMDB51:| RGB+SAF+OF |66.2%|
+|UCF101: | RGB+SAF+OF |94.1%|
+|KTH:    |  RGB+SAF+OF  |93.8%|
 
 ## Requirements:
 
