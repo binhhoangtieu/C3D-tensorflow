@@ -7,9 +7,9 @@ I add ensemble.py for ensemble multi-stream network including (optical flow, rgb
 
 Then you can use ensemble.py for fusion these network. The result of my trial is shown in the table bellow:
 
-| HMDB51:| RGB+SAF+OF |66.2%|
-|UCF101: | RGB+SAF+OF |94.1%|
-|KTH:    |  RGB+SAF+OF  |93.8%|
+| HMDB51 |   RGB+SAF+OF |66.2%|
+| UCF101 |   RGB+SAF+OF |94.1%|
+| KTH    |   RGB+SAF+OF |93.8%|
 
 ## Requirements:
 
