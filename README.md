@@ -6,18 +6,12 @@ Be aware that there are about 5% video-level accuracy margin on UCF101 split1  b
 I add ensemble.py for ensemble multi-stream network including (optical flow, rgb, selected active frame (SAF my own method). You can use activeframe.py for extracting active frames before feeding into C3D networks.
 
 Then you can use ensemble.py for fusion these network. The result of my trial is shown in the table bellow:
-| Dataset | networks | Accuracy |
-| --------|----- | ----------- |
-| HMDB51   |   RGB+SAF+OF   |66.2%|
 
-| UCF101   |   RGB+SAF+OF   |94.1%|
-
-| KTH      |   RGB+SAF+OF   |93.8%|
-
-| First Header  | Second Header | Thirsd Header |
+| Dataset       | networks      | Accuracy     |
 | ------------- | ------------- |------------- |
-| Content Cell  | Content Cell  |Content Cell  |
-| Content Cell  | Content Cell  |Content Cell  |
+| HMDB51        | RGB+SAF+OF    |    66.2%     |
+| UCF101        | RGB+SAF+OF    |    94.1%     |
+| KTH           | RGB+SAF+OF    |    93.8%     |
 
 ## Requirements:
 
