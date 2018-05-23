@@ -8,8 +8,8 @@ import math
 import scipy.stats as stats
 
 def main():
-	video_dir = './KTH' #./testdata
-	result_dir = './KTH-FSAF' #test-image
+	video_dir = './UCF-101' #./testdata
+	result_dir = './UCF101-OF' #test-image
 	loaddata(video_dir = video_dir, depth = 24, dest_forder=result_dir)
 
 def save_image_to_file(frame_array, folder):
@@ -30,7 +30,8 @@ def loaddata(video_dir, depth, dest_forder):
 
 			# frame_array = video3d_overlap(filename, depth)
 			# frame_array = video3d_selected_active_frame(filename, depth)
-			frame_array = full_selected_active_frame(filename, depth)
+			# frame_array = full_selected_active_frame(filename, depth)
+			frame_array = video3d_opticalflow(filename, depth)
 			
 			newdir = dir + "/" + os.path.splitext(os.path.basename(filename))[0]
 			directory = os.path.join(dest_forder,newdir)
@@ -62,12 +63,15 @@ def active_frames(frame_array):
 def selected_active_frame(frame_array):
 	max_euclidean_distance = 0
 	temp_frame = frame_array[0] #assign first frame
+	max = 0
 	for i in range(np.size(frame_array,axis=0)-1):
 		euclidean_distant = np.linalg.norm(frame_array[i+1]-frame_array[i])
 		if euclidean_distant > max_euclidean_distance:
 			max_euclidean_distance = euclidean_distant
 			temp_frame = frame_array[i+1]
-
+			max = i+1
+			
+	# print(max)
 	return np.array(temp_frame)
 #this function get the most active frame
 
@@ -83,7 +87,8 @@ def full_selected_active_frame(filename, depth):
 	
 	for i in range(np.size(frames,axis=0)):
 		framearray.append(cap_images[frames[i]])
-		
+		# print(frames[i])
+
 
 	return framearray
 
@@ -93,14 +98,17 @@ def video3d_selected_active_frame(filename, depth):
 	flatten_framearray = []
 	nframe = np.size(cap_images,axis = 0)
 	frames = [np.int(x * nframe / depth) for x in range(depth)]
-
+	# print(nframe, frames)
 	for i in range(np.size(frames,axis=0)):
 		if i < np.size(frames,axis=0)-1:
 			flatten_framearray = cap_images[frames[i]:frames[i+1]] 
+			# print(frames[i],frames[i+1])	
 		else: #last frame
 			flatten_framearray = cap_images[frames[i]:nframe]
-		newframe = selected_active_frame(flatten_framearray)
-		framearray.append(newframe)
+			# print(frames[i], nframe)
+		
+		# newframe = selected_active_frame(flatten_framearray)
+		# framearray.append(newframe)
 
 	return np.array(framearray)
 
@@ -158,6 +166,35 @@ def normal_distribution(d):
 
 		d[i] = tuple(temp)
 	return d
+
+def video3d_opticalflow(filename, depth):
+	framearray = []
+	cap_images = read_video_from_file(filename)
+	nframe = np.size(cap_images,axis = 0)
+	frames = [np.int(x * nframe / depth) for x in range(depth)]
+	fromframe = 0
+	toframe = 0
+	cap_images = np.asarray(cap_images, dtype=np.float32)
+	for i in range(np.size(frames)):
+		fromframe = frames[i]
+		toframe = frames[i] + 1
+		if toframe > nframe-1: 
+			fromframe = nframe-2
+			toframe = nframe-1
+		prevframe = cv2.cvtColor(cap_images[fromframe],cv2.COLOR_BGR2GRAY)
+		nextframe = cv2.cvtColor(cap_images[toframe],cv2.COLOR_BGR2GRAY)
+		hsvImg = np.zeros((np.size(cap_images[fromframe],axis=0), np.size(cap_images[fromframe],axis=1),3))
+		hsvImg[..., 1] = 0
+		flow = cv2.calcOpticalFlowFarneback(prevframe, nextframe, None, 0.5, 3, 15, 3, 5, 1.2, 0)
+		mag, ang = cv2.cartToPolar(flow[..., 0], flow[..., 1])
+		hsvImg[..., 0] = 0.5 * ang * 180 / np.pi
+		hsvImg[..., 2] = cv2.normalize(mag, None, 0, 255, cv2.NORM_MINMAX)
+		hsvImg = np.asarray(hsvImg,dtype=np.float32)
+		frame = cv2.cvtColor(hsvImg, cv2.COLOR_HSV2BGR)
+		framearray.append(frame)
+	
+	return np.array(framearray)
+
 
 #https://en.wikipedia.org/wiki/Normal_distribution#Probability_density_function
 def normpdf(x, mean, sd):
