@@ -102,8 +102,8 @@ but if you load `conv3d_deepnetA_sport1m_iter_1900000_TF.model` or `c3d_ucf101_f
 
 
 ## Use other dataset than UCF101
-Modify the `NUM_CLASSES` variable in the c3d_model.py file
-Change the `NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN` and `NUM_EXAMPLES_PER_EPOCH_FOR_EVAL` variables in the c3d_model.py file
+Modify the `NUM_CLASSES` variable in the `c3d_model.py` file
+Change the `NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN` and `NUM_EXAMPLES_PER_EPOCH_FOR_EVAL` variables in the `c3d_model.py` file
 `NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN` = (total number of training image)/`NUM_FRAMES_PER_CLIP`
 `NUM_EXAMPLES_PER_EPOCH_FOR_EVAL` = (total number of evaluating image)/`NUM_FRAMES_PER_CLIP`
 `NUM_FRAMES_PER_CLIP` is in the c3d_model.py file
